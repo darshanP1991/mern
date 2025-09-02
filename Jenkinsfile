@@ -18,7 +18,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci' // faster & reproducible than npm install
+                sh 'npm i' // faster & reproducible than npm install
             }
         }
 
