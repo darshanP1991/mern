@@ -9,12 +9,12 @@ pipeline {
         timestamps()
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/darshanP1991/mern.git'
-            }
-        }
+    //stages {
+    //    stage('Checkout') {
+    //        steps {
+    //            git branch: 'main', url: 'https://github.com/darshanP1991/mern.git'
+    //        }
+    //    }
 
         stage('Install Dependencies') {
             steps {
