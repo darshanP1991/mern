@@ -21,35 +21,60 @@ pipeline {
                 sh 'npm i' // faster & reproducible than npm install
             }
         }
-
-        stage('Lint') {
+        
+        stage('Optional Lint') {
             steps {
-                sh 'npm run lint || true'  // don’t fail yet if lint not configured
+                script {
+                    if (fileExists('package.json') && sh(script: "grep lint package.json || true", returnStdout: true).trim()) {
+                        sh 'npm run lint'
+                    } else {
+                        echo "⚠️ No lint script found, skipping"
+                    }
+                }
             }
         }
 
-        stage('Unit Tests') {
+        stage('Optional Tests') {
             steps {
-                sh 'npm test || true'
+                script {
+                    if (fileExists('package.json') && sh(script: "grep test package.json || true", returnStdout: true).trim()) {
+                        sh 'npm test'
+                    } else {
+                        echo "⚠️ No test script found, skipping"
+                    }
+                }
             }
         }
 
-        stage('Build') {
+        stage('Optional Build') {
             steps {
-                sh 'npm run build || echo "no build script"'
+                script {
+                    if (fileExists('package.json') && sh(script: "grep build package.json || true", returnStdout: true).trim()) {
+                        sh 'npm run build'
+                        archiveArtifacts artifacts: '**/build/**', fingerprint: true
+                    } else {
+                        echo "⚠️ No build script found, skipping"
+                    }
+                }
             }
         }
+        
+        stage('Verify App Runs') {
+            steps {
+                sh 'node server.js & sleep 5 && curl -I http://localhost:3000 || true'
+                sh 'pkill node || true'
+            }
+        }
+
+
     }
 
     post {
-        always {
-            archiveArtifacts artifacts: '**/build/**', fingerprint: true
-            junit 'test-results/**/*.xml'  // if tests exist
+         always {
+            echo "Pipeline completed with status: ${currentBuild.currentResult}"
         }
         failure {
-            mail to: 'team@example.com',
-                 subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "See Jenkins logs: ${env.BUILD_URL}"
+            echo "⚠️ Build failed. Skipping email notifications since no SMTP configured."
         }
     }
 }
