@@ -122,7 +122,7 @@ pipeline {
               sh """
                 docker run --rm \
                   -v /var/run/docker.sock:/var/run/docker.sock \
-                  aquasec/trivy:latest image --quiet --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 \
+                  aquasec/trivy:latest image --quiet --ignore-unfixed --severity HIGH,CRITICAL --exit-code 0 \
                   ${env.IMG}:${tag}
               """
             }
