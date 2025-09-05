@@ -1,10 +1,10 @@
 # Stage 1 - Build React frontend
 FROM node:18 AS frontend-build
 WORKDIR /app/frontend
+ENV NODE_OPTIONS=--openssl-legacy-provider
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
-RUN export NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
 # Stage 2 - Build backend
