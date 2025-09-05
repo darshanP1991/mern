@@ -1,15 +1,20 @@
-# Stage 1 - Build
-FROM node:18-alpine AS builder
+# Stage 1 - Build React frontend
+FROM node:18 AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2 - Build backend
+FROM node:18
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm install
 COPY . .
-RUN npm run build || echo "⚠️ No build script, skipping"
 
-# Stage 2 - Runtime
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app .
+# Copy frontend build into backend's public folder
+COPY --from=frontend-build /app/frontend/build ./frontend/build
+
 EXPOSE 3000
 CMD ["npm", "start"]
-
