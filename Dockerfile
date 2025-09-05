@@ -4,6 +4,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
+RUN export NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
 # Stage 2 - Build backend
