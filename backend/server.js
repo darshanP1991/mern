@@ -17,6 +17,14 @@ console.log(`Server Started at PORT ${application.port}`);
 // view engine setup
 app.set("views", path.join(__dirname, "views")); // this is the folder where we keep our pug files
 app.set("view engine", "pug"); // we use the engine pug, mustache or EJS work great too
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, 'frontend/build')));
+// Fallback to React app for unknown routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 //Register Middlewares
 // Takes the raw requests and turns them into usable properties on req.body
